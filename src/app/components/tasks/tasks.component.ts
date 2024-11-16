@@ -6,24 +6,26 @@ import { CardModule } from 'primeng/card';
 import { TabViewModule } from 'primeng/tabview';
 import { AvatarModule } from 'primeng/avatar';
 import { BadgeModule } from 'primeng/badge';
+import { TraderPanelComponent } from '../trader-panel/trader-panel.component';
 
 @Component({
   selector: 'app-tasks',
   standalone: true,
-  imports: [CommonModule, CardModule, TabViewModule, AvatarModule, BadgeModule],
+  imports: [
+    CommonModule,
+    CardModule,
+    TabViewModule,
+    AvatarModule,
+    BadgeModule,
+    TraderPanelComponent,
+  ],
   templateUrl: './tasks.component.html',
   styleUrl: './tasks.component.scss',
 })
 export class TasksComponent implements OnInit {
   tasks: any[] = [];
-  praporTasks: any[] = [];
-  therapistTasks: any[] = [];
-  skierTasks: any[] = [];
-  peacekeeper: any[] = [];
-  mechanicTasks: any[] = [];
-  jaegerTasks: any[] = [];
-  fenceTasks: any[] = [];
   error: any;
+  traders: any = [];
 
   constructor(private apollo: Apollo) {}
 
@@ -35,14 +37,17 @@ export class TasksComponent implements OnInit {
       .valueChanges.subscribe((tasks: any) => {
         console.log('tasks', tasks);
         this.tasks = tasks.data.tasks.filter((task: any) => task.kappaRequired);
-        this.praporTasks = this.tasks.filter(
-          (task: any) => task.trader.name === 'Prapor'
-        );
-        this.therapistTasks = this.tasks.filter(
-          (task: any) => task.trader.name === 'Therapist'
-        );
-        this.fenceTasks = this.tasks.filter(
-          (task: any) => task.trader.name === 'Fence'
+
+        this.tasks.forEach((task: any) => {
+          this.traders.push({
+            name: task.trader.name,
+            imageLink: task.trader.imageLink,
+          });
+        });
+
+        this.traders = this.traders.filter(
+          (value: any, index: any, self: any) =>
+            index === self.findIndex((t: any) => t.name === value.name)
         );
       });
   }
